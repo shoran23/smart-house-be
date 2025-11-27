@@ -37,7 +37,7 @@ func main() {
 		return
 	}
 
-	_ = db.UpdateUserPrivilege(conn, "test", 0)
+	_ = db.DeleteSession(conn, "admin")
 
 	select {}
 }
