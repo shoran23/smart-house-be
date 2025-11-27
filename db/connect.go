@@ -2,7 +2,6 @@ package db
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"os"
 
@@ -33,7 +32,6 @@ func setup(conn *sql.DB) {
 			log.Fatalf("DB Setup Read File %s: %s", file, err)
 			return
 		}
-		fmt.Println(string(content))
 		_, err = conn.Exec(string(content))
 		if err != nil {
 			log.Fatalf("DB Setup Execute File %s: %s", file, err)
