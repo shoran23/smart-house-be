@@ -131,3 +131,25 @@ func DeleteUser(conn *sql.DB, username string) error {
 	}
 	return nil
 }
+
+func CreateDefaultUser(conn *sql.DB) error {
+	user, err := ReadUser(conn, "admin")
+	if err != nil {
+		log.Print("DB Create Default User: ", err)
+		return err
+	}
+	if user == nil {
+		pass, err := generatePasswordHash("admin")
+		if err != nil {
+			log.Print("DB Create Default User: ", err)
+			return err
+		}
+		err = CreateUser(conn, "admin", pass, models.AdminAccess)
+		if err != nil {
+			log.Print("DB Create Default User: ", err)
+			return err
+		}
+	}
+
+	return nil
+}

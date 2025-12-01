@@ -38,6 +38,11 @@ func Serve(conn *sql.DB) {
 		server.DeviceModelHandler(w, r, conn)
 	})
 
+	// devices
+	http.HandleFunc("/config/devices", func(w http.ResponseWriter, r *http.Request) {
+		server.DeviceHandler(w, r, conn)
+	})
+
 	log.Println("Config Server Started: 8081")
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }
