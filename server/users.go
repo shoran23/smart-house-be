@@ -57,7 +57,6 @@ func postUser(w http.ResponseWriter, r *http.Request, conn *sql.DB) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
 	err = db.CreateUser(conn, user.Username, user.Password, models.Privilege(user.Privilege))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
