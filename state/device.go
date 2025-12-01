@@ -19,11 +19,10 @@ func InitDeviceState() {
 	}
 }
 
-func (s *DeviceState) AddAppliance(appliance *control_logic.Controllable) {
+func (s *DeviceState) AddControllable(c *control_logic.Controllable) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-
-	s.controllables = append(s.controllables, appliance)
+	s.controllables = append(s.controllables, c)
 }
 
 func (s *DeviceState) GetAllDevices() []*control_logic.Controllable {
@@ -36,13 +35,14 @@ func (s *DeviceState) GetAllDevices() []*control_logic.Controllable {
 func (s *DeviceState) GetAllDevicesByRoom(room string) []*control_logic.Controllable {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-
 	var found []*control_logic.Controllable
-	//for _, c := range s.controllables {
-	//	if c.) == room {
-	//		found = append(found, a)
-	//	}
-	//}
+	for _, controllable := range s.controllables {
+		c := *controllable
+		d := c.GetDeviceInfo()
+		if d.Room == room {
+			found = append(found, controllable)
+		}
+	}
 	return found
 }
 
