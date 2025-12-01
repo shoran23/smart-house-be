@@ -111,6 +111,17 @@ func UpdateUserPrivilege(conn *sql.DB, username string, new models.Privilege) er
 	return nil
 }
 
+func ReplaceUser(conn *sql.DB, username, password string, priv models.Privilege) error {
+	pass, err := generatePasswordHash(password)
+	cmd := fmt.Sprintf("UPDATE users SET username = '%s', password = '%s', privilige = '%d'  WHERE username = '%s';", username, pass, priv)
+	_, err = conn.Exec(cmd)
+	if err != nil {
+		log.Print("DB ReplaceUser Execute: ", err)
+		return err
+	}
+	return nil
+}
+
 func DeleteUser(conn *sql.DB, username string) error {
 	cmd := fmt.Sprintf("DELETE FROM users WHERE username = '%s'", username)
 	_, err := conn.Exec(cmd)

@@ -15,12 +15,18 @@ var upgrader = websocket.Upgrader{
 }
 
 func Serve(conn *sql.DB) {
+	// websocket
 	http.HandleFunc("/control-live", controlLiveHandler)
 	http.HandleFunc("/control", controlHandler)
-	http.HandleFunc("/control/appliances", controlApplianceHandler)
+
+	// login/logout
 	http.HandleFunc("/control/login", func(w http.ResponseWriter, r *http.Request) {
 		server.Login(w, r, conn)
 	})
+	http.HandleFunc("/control/logout", func(w http.ResponseWriter, r *http.Request) {
+		server.Logout(w, r, conn)
+	})
+
 	log.Println("Control Server Started :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

@@ -20,16 +20,18 @@ func Serve(conn *sql.DB) {
 		}
 	})
 
-	// authentication
+	// login/logout
 	http.HandleFunc("/config/login", func(w http.ResponseWriter, r *http.Request) {
 		server.Login(w, r, conn)
 	})
-
 	http.HandleFunc("/config/logout", func(w http.ResponseWriter, r *http.Request) {
 		server.Logout(w, r, conn)
 	})
 
 	// users
+	http.HandleFunc("/config/users", func(w http.ResponseWriter, r *http.Request) {
+		server.UserHandler(w, r, conn)
+	})
 
 	log.Println("Config Server Started: 8081")
 	log.Fatal(http.ListenAndServe(":8081", nil))
