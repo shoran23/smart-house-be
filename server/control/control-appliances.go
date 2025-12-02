@@ -7,12 +7,12 @@ import (
 
 func getAllAppliances(w http.ResponseWriter, r *http.Request) {
 	// get appliances by room
-	// get from state
+	// get from runtime
 }
 
 func getAppliancesByRoom(room string, w http.ResponseWriter, r *http.Request) {
 	// get appliances by room
-	// get from state
+	// get from runtime
 }
 
 func controlApplianceHandler(w http.ResponseWriter, r *http.Request) {

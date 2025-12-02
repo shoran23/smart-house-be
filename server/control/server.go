@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"smart_house/be/runtime"
 	"smart_house/be/server"
 
 	"github.com/gorilla/websocket"
@@ -14,7 +15,7 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-func Serve(conn *sql.DB) {
+func Serve(conn *sql.DB, dr *runtime.DeviceRuntime) {
 	// websocket
 	http.HandleFunc("/control-live", controlLiveHandler)
 	http.HandleFunc("/control", controlHandler)

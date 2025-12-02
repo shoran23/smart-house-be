@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	control_logic "smart_house/be/control-logic"
 	"smart_house/be/db/models"
 )
 
@@ -16,7 +17,7 @@ type SmartSwitch struct {
 	OnStatusChange func(string, *Status)
 }
 
-func NewSmartSwitch(device *models.Device, onStatusChange func(string, *Status)) *SmartSwitch {
+func NewSmartSwitch(device *models.Device, onStatusChange func(string, *Status)) control_logic.Controllable {
 	return &SmartSwitch{
 		device:         device,
 		output:         false,
@@ -28,7 +29,6 @@ func NewSmartSwitch(device *models.Device, onStatusChange func(string, *Status))
 func (s *SmartSwitch) GetDeviceInfo() *models.Device {
 	return s.device
 }
-
 func (s *SmartSwitch) GetControlMethods() []string {
 	return []string{"SetSwitch", "ToggleSwitch", "GetSwitchStatus"}
 }
