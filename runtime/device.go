@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"smart_house/be/control-logic"
-	"smart_house/be/control-logic/smart_switch"
+	"smart_house/be/control_logic"
+	"smart_house/be/control_logic/smart_switch"
 	"smart_house/be/db"
 	"sync"
 )
@@ -72,11 +72,7 @@ func InitializeDevices(conn *sql.DB) *DeviceRuntime {
 	}
 	for _, d := range *devices {
 
-		fmt.Printf("d = %+v\n", d)
-
 		dm, err := db.ReadDeviceModel(conn, d.Make, d.Model)
-
-		fmt.Printf("dm = %+v\n", dm)
 
 		if err != nil {
 			log.Fatal("Runtime Devices ReadDeviceModel:", err)
@@ -87,7 +83,9 @@ func InitializeDevices(conn *sql.DB) *DeviceRuntime {
 		switch dm.DeviceType {
 		case int(control_logic.TypeSmartSwitch):
 			fmt.Println("SmartSwitch Device Found")
-			dr.AddControllable(smart_switch.NewSmartSwitch(&d, nil))
+			c := smart_switch.NewSmartSwitch(&d, nil)
+			c.(*smart_switch.SmartSwitch).ConnectWebsocket()
+			dr.AddControllable(c)
 		}
 	}
 

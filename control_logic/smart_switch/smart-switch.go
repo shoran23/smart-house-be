@@ -6,8 +6,12 @@ import (
 	"io"
 	"log"
 	"net/http"
-	control_logic "smart_house/be/control-logic"
+	"net/url"
+	"smart_house/be/control_logic"
 	"smart_house/be/db/models"
+	"strings"
+
+	"github.com/gorilla/websocket"
 )
 
 type SmartSwitch struct {
@@ -30,7 +34,7 @@ func (s *SmartSwitch) GetDeviceInfo() *models.Device {
 	return s.device
 }
 func (s *SmartSwitch) GetControlMethods() []string {
-	return []string{"SetSwitch", "ToggleSwitch", "GetSwitchStatus"}
+	return []string{"SetSwitch", "ToggleSwitch", "GetSwitchStatus", "ConnectWebsocket", "DisconnectWebsocket"}
 }
 
 // SWITCH METHODS
@@ -97,4 +101,48 @@ func (s *SmartSwitch) GetSwitchStatus() {
 	if s.OnStatusChange != nil {
 		s.OnStatusChange(s.device.DeviceId, s.status)
 	}
+}
+
+// WEBSOCKET METHODS
+func (s *SmartSwitch) parseWebsocketMessage(msg string) {
+	var wsp WebSocketResponse
+	jsonReader := strings.NewReader(msg)
+	decoder := json.NewDecoder(jsonReader)
+	err := decoder.Decode(&wsp)
+	if err != nil {
+		log.Printf("Smart Switch %s ParseWebsocketMessage: %s\n", msg, err)
+	}
+
+	fmt.Printf("Smart Switch %s ParseWebsocketMessage: %+v\n", s.device.Name, wsp)
+	fmt.Printf("Smart Switch %s Output: %t\n", s.device.Name, wsp.Result.SwitchZero.Output)
+}
+
+func (s *SmartSwitch) ConnectWebsocket() error {
+	//url := "ws://" + s.device.Address + "/rpc"
+	u := url.URL{Scheme: "ws", Host: s.device.Address, Path: "/rpc"}
+
+	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+	if err != nil {
+		log.Println("Smart Switch %s ConnectWebsocket: %s\n:", s.device.Room, err)
+		return err
+	}
+
+	err = c.WriteJSON(WebSocketRequest{Id: s.device.DeviceId, Src: "smart-house", Method: "Shelly.GetStatus"})
+	if err != nil {
+		log.Println("Smart Switch %s ConnectWebsocket Write: %s\n:", s.device.Room, err)
+		return err
+	}
+
+	// create channel to signal interrupt
+	go func() {
+		for {
+			_, message, err := c.ReadMessage()
+			if err != nil {
+				log.Printf("Smart Switch %s ConnectWebsocket Read: %s\n", s.device.DeviceId, err)
+				return
+			}
+			s.parseWebsocketMessage(string(message))
+		}
+	}()
+	return nil
 }

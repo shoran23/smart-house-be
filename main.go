@@ -26,11 +26,6 @@ func main() {
 
 	// initialize runtimes
 	dr := runtime.InitializeDevices(conn)
-	devices := dr.GetAllDevices()
-	fmt.Println("Devices: ", len(devices))
-	for _, d := range devices {
-		fmt.Printf("Device: %+v ", d.GetDeviceInfo())
-	}
 
 	// launch servers
 	go control.Serve(conn, dr)
